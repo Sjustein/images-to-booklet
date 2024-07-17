@@ -26,7 +26,7 @@ def preprocess_image(image_path, number, crop_vector, add_number):
 
 
 # Function to compile the temporary images into a pdf
-def create_pdf_with_images(image_folder, output_pdf, crop_vector, document_title, add_nunber, sequence):
+def create_pdf_with_images(output_pdf, crop_vector, document_title, add_nunber, sequence):
     # Create a blank A4 canvas
     c = canvas.Canvas(output_pdf, pagesize=A4)
     width, height = A4
@@ -62,7 +62,7 @@ def create_pdf_with_images(image_folder, output_pdf, crop_vector, document_title
                     break
 
                 # Find the current image to be processed
-                image_path = os.path.join(image_folder, f'{img_index}.png')
+                image_path = os.path.join('input', f'{img_index}.jpeg')
                 numbered_image = preprocess_image(image_path, img_index, crop_vector, add_number)
 
                 # Scale the images to an appropriate size to include in the booklet
@@ -80,7 +80,7 @@ def create_pdf_with_images(image_folder, output_pdf, crop_vector, document_title
 
                 # Resize the image with a resolution large enough so it's quality is adequately retained
                 numbered_image = numbered_image.resize((int(scaled_width * 2), int(scaled_height * 2)), Image.ANTIALIAS)
-                temp_image_path = os.path.join(image_folder, f'temp_{img_index}.png')
+                temp_image_path = os.path.join('input', f'temp_{img_index}.jpeg')
                 numbered_image.save(temp_image_path)
 
                 # Draw the image on the current page
@@ -97,10 +97,10 @@ def create_pdf_with_images(image_folder, output_pdf, crop_vector, document_title
 
 
 # Function to cleanup temporary files the script creates
-def cleanup(image_folder, id_start, id_end):
+def cleanup(id_start, id_end):
     for i in range(id_start, id_end + 1):
         # Define the filename
-        filename = os.path.join(image_folder, f'temp_{i}.png')
+        filename = os.path.join('input', f'temp_{i}.jpeg')
 
         # Check if the file exists
         if os.path.exists(filename):
@@ -112,17 +112,16 @@ def cleanup(image_folder, id_start, id_end):
     print('Finished cleanup of temporary images.')
 
 
-input_folder = 'input'  # Relative folder name containing the input images, relative from the root folder
 output_pdf = 'booklet.pdf'  # The output filename
-crop_vector = (350, 0, 1250, 750)  # The area to crop out of each image
+crop_vector = (150, 0, 500, 450)  # The area to crop out of each image
 sequence_start = 0  # Start the image sequence at this number (filename)
-sequence_end = 105  # End the image sequence after this number (filename0
+sequence_end = 5  # End the image sequence after this number (filename0
 document_title = "Booklet title"  # The title printed above the booklet
 add_number = True  # Whether to add a number to each image in the top left
 
 # Actually create the pdf
-create_pdf_with_images(input_folder, output_pdf, crop_vector, document_title, add_number,
+create_pdf_with_images(output_pdf, crop_vector, document_title, add_number,
                        (sequence_start, sequence_end))
 
 # Clean up the temporary images generated
-cleanup(input_folder, sequence_start, sequence_end)
+cleanup(sequence_start, sequence_end)
